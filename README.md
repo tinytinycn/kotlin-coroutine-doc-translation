@@ -35,7 +35,7 @@ Kotlin 作为一种语言，在其标准库中只提供了最小的底层 API，
 ## 其他参考资料
 
 - [Coroutines协程的UI编程指南](https://github.com/Kotlin/kotlinx.coroutines/blob/master/ui/coroutines-guide-ui.md)
-- [Coroutines协程设计文档(KEEP)](https://github.com/Kotlin/KEEP/blob/master/proposals/coroutines.md)
+- [Coroutines协程设计文档(KEEP)](doc/0-Coroutines协程设计文档(KEEP).md)
 - [完整的 kotlinx.coroutines API 参考资料](https://kotlinlang.org/api/kotlinx.coroutines/)
 - [Android中的协程最佳实践](https://developer.android.com/kotlin/coroutines/coroutines-best-practices)
 - [Kotlin coroutines和flow的其他Android资源](https://developer.android.com/kotlin/coroutines/additional-resources)
