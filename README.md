@@ -21,12 +21,12 @@ Kotlin 作为一种语言，在其标准库中只提供了最小的底层 API，
 
 - [协程基础](doc/1-协程基础.md)
 - [实践:coroutines协程和channels通道](doc/2-实践:coroutines协程和channels通道.md)
-- 协程的取消和超时
-- 组成suspending functions
-- 协程上下文和调度器
+- [取消和超时](doc/3-取消和超时.md)
+- [组成suspending functions](doc/4-组合挂起函数.md)
+- [协程上下文和调度器](doc/5-协程上下文和调度器.md)
 - Flow异步流
 - Channels通道
-- 协程异常处理
+- [协程异常处理](doc/8-协程异常处理.md)
 - Shared mutable state共享可变状态和并发
 - Select expression (experimental实验性)
 - 教程:使用IntelliJ IDEA调试协程
