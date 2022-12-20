@@ -1,4 +1,4 @@
-# 实践:coroutines协程和channels通道
+## 实践:coroutines协程和channels通道
 
 (原文档修改日期: Last modified: 28 November 2022)
 
@@ -16,7 +16,7 @@
 
 > 您可以在[项目存储库](http://github.com/kotlin-hands-on/intro-coroutines)的 `solutions` 分支上找到所有任务的解决方案。
 
-# 在你开始前
+## 在你开始前
 
 1. 下载并安装最新版本的 IntelliJ IDEA。
 2. 通过在欢迎屏幕上选择从 VCS 获取或选择 File | New | Project from Version Control 来克隆项目模板。
