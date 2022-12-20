@@ -1,4 +1,4 @@
-## 实践:coroutines协程和channels通道
+# 实践:coroutines协程和channels通道
 
 (原文档修改日期: Last modified: 28 November 2022)
 
@@ -16,7 +16,7 @@
 
 > 您可以在[项目存储库](http://github.com/kotlin-hands-on/intro-coroutines)的 `solutions` 分支上找到所有任务的解决方案。
 
-## 在你开始前
+# 在你开始前
 
 1. 下载并安装最新版本的 IntelliJ IDEA。
 2. 通过在欢迎屏幕上选择从 VCS 获取或选择 File | New | Project from Version Control 来克隆项目模板。
@@ -46,7 +46,7 @@
 有多种实现此逻辑的方法：使用[阻塞式请求](#阻塞式请求)或[回调](#回调)。
 您会将这些解决方案与使用[协程](#协程)的解决方案进行比较，并了解如何使用[通道](#通道)在不同的协程之间共享信息。
 
-## 阻塞式请求
+# 阻塞式请求
 
 您将使用 Retrofit 库向 GitHub 执行 HTTP 请求。它允许请求给定组织下的存储库列表和每个存储库的贡献者列表：
 
@@ -125,7 +125,7 @@ interface GitHubService {
   - updateResults() 更新 UI，因此必须始终从 UI 线程调用它。
   - 由于 loadContributorsBlocking() 也是从 UI 线程调用的，因此 UI 线程被阻塞并且 UI 被冻结。
 
-### [Task 1](https://kotlinlang.org/docs/coroutines-and-channels.html#task-1)
+## [Task 1](https://kotlinlang.org/docs/coroutines-and-channels.html#task-1)
 
 第一个任务帮助您熟悉任务域。目前，每个贡献者的名字都会重复多次，每个贡献者参与的项目一次。实现 `aggregate()` 函数组合用户，以便每个贡献者只添加一次。 
 `User.contributions` 属性应包含给定用户对所有项目的贡献总数。结果列表应根据贡献数量降序排列。
@@ -154,7 +154,7 @@ fun List<User>.aggregate(): List<User> =
 
 另一种解决方案是使用 groupingBy() 函数而不是 groupBy()。
 
-## 回调
+# 回调
 
 以前的解决方案有效，但它会阻塞线程并因此冻结 UI。避免这种情况的传统方法是使用 callbacks 。
 
@@ -162,7 +162,7 @@ fun List<User>.aggregate(): List<User> =
 
 要使 UI 响应，您可以将整个计算移动到一个单独的线程或切换到 Retrofit API，它使用回调而不是阻塞调用。
 
-### 使用后台线程
+## 使用后台线程
 
 1. 打开 `src/tasks/Request2Background.kt` 并查看其实现。首先，整个计算被转移到不同的线程。 `thread()` 函数启动一个新线程：
 ```kotlin
@@ -196,7 +196,7 @@ loadContributorsBackground(service, req) { users ->
 
 但是，如果您尝试通过 `BACKGROUND` 选项加载贡献者，您会看到列表已更新但没有任何变化。 
 
-### [Task 2](https://kotlinlang.org/docs/coroutines-and-channels.html#task-2)
+## [Task 2](https://kotlinlang.org/docs/coroutines-and-channels.html#task-2)
 
 修复 `src/tasks/Request2Background.kt` 中的 `loadContributorsBackground()` 函数，以便在 UI 中显示结果列表。
 
@@ -212,7 +212,7 @@ thread {
 
 确保明确调用回调中传递的逻辑。否则，什么也不会发生。
 
-### 使用 Retrofit 回调 API
+## 使用 Retrofit 回调 API
 
 在之前的解决方案中，整个加载逻辑都移到了后台线程，但这仍然不是资源的最佳利用方式。所有的加载请求都是顺序进行的，线程在等待加载结果时被阻塞，而它可能已经被其他任务占用了。
 具体来说，线程可以开始加载另一个请求以更早地接收整个结果。
@@ -257,12 +257,12 @@ fun loadContributorsCallbacks(
 
 想想为什么给定的代码不能按预期工作并尝试修复它，或者查看下面的解决方案。
 
-### [Task 3 (可选的)](https://kotlinlang.org/docs/coroutines-and-channels.html#task-3-optional)
+## [Task 3 (可选的)](https://kotlinlang.org/docs/coroutines-and-channels.html#task-3-optional)
 
 重写 `src/tasks/Request3Callbacks.kt` 文件中的代码，以便显示加载的贡献者列表。
 
 
-## 挂起函数
+# 挂起函数
 
 您可以使用挂起函数实现相同的逻辑。不返回 `Call<List<Repo>>`，而是将 API 调用定义为[挂起函数](https://kotlinlang.org/docs/composing-suspending-functions.html)，如下所示：
 
@@ -299,7 +299,7 @@ interface GitHubService {
 }
 ```
 
-### [Task 4](https://kotlinlang.org/docs/coroutines-and-channels.html#task-4)
+## [Task 4](https://kotlinlang.org/docs/coroutines-and-channels.html#task-4)
 
 您的任务是更改加载贡献者的函数代码，以使用两个新的暂停函数 `getOrgRepos()` 和 `getRepoContributors()`。
 新的 `loadContributorsSuspend()` 函数被标记为 `suspend` 以使用新的 API。
@@ -330,7 +330,7 @@ suspend fun loadContributorsSuspend(service: GitHubService, req: RequestData): L
 - `loadContributorsSuspend()` 应定义为挂起函数。
 - 您不再需要调用之前返回 `Response` 的 `execute`，因为现在 API 函数直接返回 `Response`。请注意，此详细信息特定于 Retrofit 库。对于其他库，API 会有所不同，但概念是相同的。
 
-## 协程
+# 协程
 
 具有暂停功能的代码看起来类似于“阻塞”版本。与阻塞版本的主要区别在于协程被挂起而不是阻塞线程：
 
@@ -341,7 +341,7 @@ thread -> coroutine
 
 > 协程通常被称为轻量级线程，因为您可以在协程上运行代码，类似于在线程上运行代码的方式。之前阻塞（并且必须避免）的操作现在可以暂停协程。
 
-### 启动一个新的协程
+## 启动一个新的协程
 
 如果您查看 `loadContributorsSuspend()` 在 `src/contributors/Contributors.kt` 中的使用方式，您会发现它在 `launch` 中被调用。 `launch` 是一个以 lambda 作为参数的库函数：
 
@@ -388,7 +388,7 @@ launch {
 
 挂起函数公平对待线程，不会因为“等待”而阻塞它。但是，这还没有带来任何并发性。
 
-## 并发
+# 并发
 
 Kotlin 协程比线程占用资源少得多。每次你想开始一个新的异步计算时，你可以创建一个新的协程。
 
@@ -450,7 +450,7 @@ fun main() = runBlocking {
 
 总加载时间与 `CALLBACKS` 版本大致相同，但不需要任何回调。更重要的是，`async` 明确强调代码中哪些部分是并发运行的。
 
-### [Task 5](https://kotlinlang.org/docs/coroutines-and-channels.html#task-5)
+## [Task 5](https://kotlinlang.org/docs/coroutines-and-channels.html#task-5)
 
 在 `Request5Concurrent.kt` 文件中，使用之前的 `loadContributorsSuspend()` 函数实现一个 `loadContributorsConcurrent()` 函数。
 
@@ -482,7 +482,7 @@ Solution for task 5
 
 [(省略)](https://kotlinlang.org/docs/coroutines-and-channels.html#task-5)
 
-## 结构化并发
+# 结构化并发
 
 - 协程范围负责不同协程之间的结构和父子关系。新协程通常需要在范围内启动。
 - 协程上下文存储用于运行给定协程的附加技术信息，例如协程自定义名称，或指定协程应调度到的线程的调度程序。
@@ -524,8 +524,15 @@ fun main() = runBlocking { /* this: CoroutineScope */
 
 使用 GlobalScope.async 时，没有将多个协程绑定到较小范围的结构。从全局范围启动的协程都是独立的——它们的生命周期仅受整个应用程序生命周期的限制。可以存储对从全局范围启动的协程的引用并等待其完成或显式取消它，但这不会像结构化并发那样自动发生。
 
+## [取消加载贡献者](https://kotlinlang.org/docs/coroutines-and-channels.html#canceling-the-loading-of-contributors)
 
-## 显示进度
+(省略)
+
+## [使用外部作用域的上下文](https://kotlinlang.org/docs/coroutines-and-channels.html#using-the-outer-scope-s-context)
+
+(省略)
+
+# 显示进度
 
 尽管某些存储库的信息加载速度相当快，但用户只有在加载所有数据后才能看到结果列表。在此之前，加载程序图标会运行以显示进度，但没有关于当前状态或已加载哪些贡献者的信息。
 
@@ -561,7 +568,7 @@ launch(Dispatchers.Default) {
 - updateResults() 参数在 loadContributorsProgress() 中声明为暂停。有必要调用 withContext，它是相应 lambda 参数中的一个挂起函数。
 - updateResults() 回调采用额外的布尔参数作为指定加载是否已完成以及结果是否为最终结果的参数。
 
-### [Task 6](https://kotlinlang.org/docs/coroutines-and-channels.html#task-6)
+## [Task 6](https://kotlinlang.org/docs/coroutines-and-channels.html#task-6)
 
 在 Request6Progress.kt 文件中，实现显示中间进度的 loadContributorsProgress() 函数。它基于 Request4Suspend.kt 中的 loadContributorsSuspend() 函数。
 
@@ -608,7 +615,7 @@ suspend fun loadContributorsProgress(
 
 要添加并发，请使用通道。
 
-## 通道
+# 通道
 
 编写具有共享可变状态的代码非常困难且容易出错（就像在使用回调的解决方案中一样）。一种更简单的方法是通过通信而不是使用通用的可变状态来共享信息。协程可以通过通道相互通信。
 
@@ -643,19 +650,19 @@ interface Channel<E> : SendChannel<E>, ReceiveChannel<E>
 
 库中定义了几种类型的通道。它们的不同之处在于它们可以在内部存储多少元素以及是否可以暂停 send() 调用。对于所有通道类型， receive() 调用的行为相似：如果通道不为空，它接收一个元素；否则，它被暂停。
 
-#### Unlimited channel
+## Unlimited channel
 
 无限通道是最接近队列的模拟：生产者可以将元素发送到这个通道，它会无限增长。 send() 调用永远不会被挂起。如果程序内存不足，您将得到 OutOfMemoryException。无限制通道和队列之间的区别在于，当消费者尝试从空通道接收数据时，它会暂停，直到发送一些新元素。
 
 ![unlimited-channel](../img/unlimited-channel.png)
 
-#### Buffered channel
+## Buffered channel
 
 缓冲通道的大小受指定数字的限制。生产者可以将元素发送到此通道，直到达到大小限制。所有元素都在内部存储。当通道已满时，将暂停对其的下一个“发送”调用，直到有更多可用空间可用为止。
 
 ![buffered-channel](../img/buffered-channel.png)
 
-#### Rendezvous channel
+## Rendezvous channel
 
 “Rendezvous”通道是一个没有缓冲区的通道，与大小为零的缓冲通道相同。其中一个函数（send() 或 receive()）始终处于挂起状态，直到另一个函数被调用。
 
@@ -665,7 +672,7 @@ interface Channel<E> : SendChannel<E>, ReceiveChannel<E>
 
 ![rendezvous-channel](../img/rendezvous-channel.png)
 
-#### Conflated channel
+## Conflated channel
 
 发送到合并通道的新元素将覆盖先前发送的元素，因此接收方将始终只获得最新的元素。 send() 调用永远不会挂起。
 
@@ -714,11 +721,11 @@ fun log(message: Any?) {
 
 > 观看此[视频](https://www.youtube.com/watch?v=HpWQUoVURWQ)以更好地了解 channels 。
 
-#### [Task 7](https://kotlinlang.org/docs/coroutines-and-channels.html#task-7)
+## [Task 7](https://kotlinlang.org/docs/coroutines-and-channels.html#task-7)
 
 (省略)
 
-## 测试协程
+# 测试协程
 
 现在让我们测试所有解决方案，以检查具有并发协程的解决方案是否比具有挂起功能的解决方案更快，并检查具有通道的解决方案是否比简单的“进程”解决方案更快。
 
@@ -815,11 +822,11 @@ compileTestKotlin {
 
 在本教程对应的项目中，编译器参数已经添加到Gradle脚本中。
 
-#### [Task 8](https://kotlinlang.org/docs/coroutines-and-channels.html#task-8)
+## [Task 8](https://kotlinlang.org/docs/coroutines-and-channels.html#task-8)
 
 (省略)
 
-### 下一步是什么
+# 下一步是什么
 
 - 查看 KotlinConf 上的 [Kotlin 异步编程](https://kotlinconf.com/workshops/?_gl=1*75bqak*_ga*ODUzNjQyNzQ1LjE2MTQ5MTg1MTI.*_ga_9J976DJZ68*MTY3MTUwMjIxNi4yNi4xLjE2NzE1MDI0NTYuNjAuMC4w&_ga=2.93813653.907848520.1671373453-853642745.1614918512)研讨会。
 - 了解有关使用[虚拟时间和实验测试包](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-test/)的更多信息。
