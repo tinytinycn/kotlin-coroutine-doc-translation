@@ -138,7 +138,7 @@ interface GitHubService {
 
 执行此任务后，“kotlin”组织的结果列表应类似于以下内容：
 
-![aggregate](https://kotlinlang.org/docs/images/aggregate.png)
+![aggregate](../img/aggregate.png)
 
 Solution for task 1:
 
@@ -173,7 +173,7 @@ thread {
 
 现在所有的加载都被转移到一个单独的线程，主线程是空闲的，可以被其他任务占用：
 
-![background](https://kotlinlang.org/docs/images/background.png)
+![background](../img/background.png)
 
 2. `loadContributorsBackground()` 函数的签名发生了变化。它需要一个 `updateResults()` 回调作为在所有加载完成后调用它的最后一个参数： 
 ```kotlin
@@ -221,7 +221,7 @@ thread {
 
 然后可以在收到前一个存储库的结果之前开始加载每个存储库（并调用相应的回调）：
 
-![callbacks](https://kotlinlang.org/docs/images/callbacks.png)
+![callbacks](../img/callbacks.png)
 
 Retrofit 回调 API 可以帮助实现这一点。 `Call.enqueue()` 函数启动 HTTP 请求并将回调作为参数。在此回调中，您需要指定每次请求后需要执行的操作。
 
@@ -358,7 +358,7 @@ launch {
 
 协程在线程之上运行并且可以被挂起。当协程挂起时，相应的计算也会暂停，从线程中移除并存储在内存中。同时，该线程可以自由地被其他任务占用：
 
-![suspension-process](https://kotlinlang.org/docs/images/suspension-process.gif)
+![suspension-process](../img/suspension-process.gif)
 
 当计算准备好继续时，它返回到一个线程（不一定是同一个线程）。
 
@@ -366,7 +366,7 @@ launch {
 
 协程只有在收到相应的响应后才会恢复：
 
-![suspend-requests](https://kotlinlang.org/docs/images/suspend-requests.png)
+![suspend-requests](../img/suspend-requests.png)
 
 在等待接收响应时，线程可以自由地被其他任务占用。 UI 保持响应，尽管所有请求都发生在主 UI 线程上：
 
@@ -380,7 +380,7 @@ launch {
 ```
 2. 日志可以告诉你相应的代码运行在哪个协程上。要启用它，请打开 **Run | Edit configurations** 并添加 `-Dkotlinx.coroutines.debug` VM 选项：
 
-![run-configuration](https://kotlinlang.org/docs/images/run-configuration.png)
+![run-configuration](../img/run-configuration.png)
 
 当使用此选项运行 `main()` 时，协程名称将附加到线程名称。您还可以修改运行所有 Kotlin 文件的模板，并默认启用此选项。
 
@@ -446,7 +446,7 @@ fun main() = runBlocking {
 
 当每个“贡献者”请求在一个新协程中启动时，所有请求都是异步启动的。可以在收到前一个请求的结果之前发送一个新请求：
 
-![concurrency](https://kotlinlang.org/docs/images/concurrency.png)
+![concurrency](../img/concurrency.png)
 
 总加载时间与 `CALLBACKS` 版本大致相同，但不需要任何回调。更重要的是，`async` 明确强调代码中哪些部分是并发运行的。
 
@@ -531,7 +531,7 @@ fun main() = runBlocking { /* this: CoroutineScope */
 
 您可以更早地显示中间结果，并在为每个存储库加载数据后显示所有贡献者：
 
-![loading](https://kotlinlang.org/docs/images/loading.gif)
+![loading](../img/loading.gif)
 
 要实现此功能，在 src/tasks/Request6Progress.kt 中，您需要将更新 UI 的逻辑作为回调传递，以便在每个中间状态调用它：
 
@@ -598,13 +598,13 @@ suspend fun loadContributorsProgress(
 
 连续与并发
 
-![progress](https://kotlinlang.org/docs/images/progress.png)
+![progress](../img/progress.png)
 
 此代码不包括并发性。它是顺序的，因此您不需要同步。
 
 最好的选择是并发发送请求并在获得每个存储库的响应后更新中间结果：
 
-![progress-and-concurrency](https://kotlinlang.org/docs/images/progress-and-concurrency.png)
+![progress-and-concurrency](../img/progress-and-concurrency.png)
 
 要添加并发，请使用通道。
 
@@ -614,11 +614,11 @@ suspend fun loadContributorsProgress(
 
 通道是允许数据在协程之间传递的通信原语。一个协程可以向通道发送一些信息，而另一个可以从它接收该信息：
 
-![using-channel](https://kotlinlang.org/docs/images/using-channel.png)
+![using-channel](../img/using-channel.png)
 
 发送（生产）信息的协程通常称为生产者，接收（消费）信息的协程称为消费者。一个或多个协程可以向同一个通道发送信息，一个或多个协程可以从中接收数据：
 
-![using-channel-many-coroutines](https://kotlinlang.org/docs/images/using-channel-many-coroutines.png)
+![using-channel-many-coroutines](../img/using-channel-many-coroutines.png)
 
 当许多协程从同一通道接收信息时，每个元素仅由其中一个消费者处理一次。一旦处理了一个元素，它就会立即从通道中删除。
 
@@ -647,13 +647,13 @@ interface Channel<E> : SendChannel<E>, ReceiveChannel<E>
 
 无限通道是最接近队列的模拟：生产者可以将元素发送到这个通道，它会无限增长。 send() 调用永远不会被挂起。如果程序内存不足，您将得到 OutOfMemoryException。无限制通道和队列之间的区别在于，当消费者尝试从空通道接收数据时，它会暂停，直到发送一些新元素。
 
-![unlimited-channel](https://kotlinlang.org/docs/images/unlimited-channel.png)
+![unlimited-channel](../img/unlimited-channel.png)
 
 #### Buffered channel
 
 缓冲通道的大小受指定数字的限制。生产者可以将元素发送到此通道，直到达到大小限制。所有元素都在内部存储。当通道已满时，将暂停对其的下一个“发送”调用，直到有更多可用空间可用为止。
 
-![buffered-channel](https://kotlinlang.org/docs/images/buffered-channel.png)
+![buffered-channel](../img/buffered-channel.png)
 
 #### Rendezvous channel
 
@@ -663,13 +663,13 @@ interface Channel<E> : SendChannel<E>, ReceiveChannel<E>
 
 “会合”名称（“在约定的时间和地点开会”）指的是 send() 和 receive() 应该“准时会面”。
 
-![rendezvous-channel](https://kotlinlang.org/docs/images/rendezvous-channel.png)
+![rendezvous-channel](../img/rendezvous-channel.png)
 
 #### Conflated channel
 
 发送到合并通道的新元素将覆盖先前发送的元素，因此接收方将始终只获得最新的元素。 send() 调用永远不会挂起。
 
-![conflated-channel](https://kotlinlang.org/docs/images/conflated-channel.gif)
+![conflated-channel](../img/conflated-channel.gif)
 
 当你创建一个通道时，指定它的类型或缓冲区大小（如果你需要一个缓冲的）：
 
@@ -748,7 +748,7 @@ repo-3 - 800 ms delay
 
 使用这种机制的测试运行速度很快，但您仍然可以检查在虚拟时间的不同时刻发生了什么。总运行时间急剧减少：
 
-![time-comparsion](https://kotlinlang.org/docs/images/time-comparison.png)
+![time-comparsion](../img/time-comparison.png)
 
 要使用虚拟时间，请将 runBlocking 调用替换为 runTest。 runTest 将 TestScope 的扩展 lambda 作为参数。当您在此特殊范围内的挂起函数中调用延迟时，延迟将增加虚拟时间而不是实时延迟：
 
